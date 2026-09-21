@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maze Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #1e1e1e;
+            color: #fff;
+            text-align: center;
+            overflow: hidden;
+        }
+        h1 {
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        #game-container {
+            position: relative;
+        }
+        canvas {
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.2);
+        }
+        #message {
+            margin-top: 15px;
+            font-size: 22px;
+            font-weight: bold;
+            color: rgb(83, 178, 225);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background: #ea6fa7;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #ea6fa7;
+        }
+    </style>
+</head>
+<body>
+    <h1>Maze Game</h1>
+
+    <div id="game-container">
+        <canvas id="mazeCanvas"></canvas>
+    </div>
+
+    <div id="message">You Won!🎉 </div>
+    <button onclick="generateNewMaze()">Generate Another Maze</button>
+
+    <script>
+        const canvas = document.getElementById("mazeCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const cols = 10, rows = 10, cellSize = 60;
+        canvas.width = cols * cellSize;
+        canvas.height = rows * cellSize;
+
+        let grid = [];
+        let stack = [];
+        let current;
+        let player = { x: 0, y: 0 };
+        const finish = { x: cols - 1, y: rows - 1 };
+
+        class Cell {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.walls = { top: true, right: true, bottom: true, left: true };
+                this.visited = false;
+            }
+
+            drawWalls() {
+                let x = this.x * cellSize, y = this.y * cellSize;
+                ctx.strokeStyle = "#fff";
+                ctx.lineWidth = 2;
+
+                if (this.walls.top) drawLine(x, y, x + cellSize, y);
+                if (this.walls.right) drawLine(x + cellSize, y, x + cellSize, y + cellSize);
+                if (this.walls.bottom) drawLine(x, y + cellSize, x + cellSize, y + cellSize);
+                if (this.walls.left) drawLine(x, y, x, y + cellSize);
+            }
+        }
+
+        function drawLine(x1, y1, x2, y2) {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+        }
+
+        function createGrid() {
+            grid = [];
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    grid.push(new Cell(x, y));
+                }
+            }
+            current = grid[0];
+        }
+
+        function getIndex(x, y) {
+            if (x < 0 || y < 0 || x >= cols || y >= rows) return -1;
+            return x + y * cols;
+        }
+
+        function removeWall(a, b) {
+            let dx = a.x - b.x, dy = a.y - b.y;
+            if (dx === 1) { a.walls.left = false; b.walls.right = false; }
+            else if (dx === -1) { a.walls.right = false; b.walls.left = false; }
+            else if (dy === 1) { a.walls.top = false; b.walls.bottom = false; }
+            else if (dy === -1) { a.walls.bottom = false; b.walls.top = false; }
+        }
+
+        function checkNeighbors(cell) {
+            let neighbors = [];
+            let directions = [
+                { dx: 0, dy: -1 }, { dx: 1, dy: 0 }, 
+                { dx: 0, dy: 1 }, { dx: -1, dy: 0 }
+            ];
+
+            for (let { dx, dy } of directions) {
+                let neighbor = grid[getIndex(cell.x + dx, cell.y + dy)];
+                if (neighbor && !neighbor.visited) {
+                    neighbors.push(neighbor);
+                }
+            }
+            return neighbors.length > 0 ? neighbors[Math.floor(Math.random() * neighbors.length)] : undefined;
+        }
+
+        async function generateMaze() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            while (stack.length > 0 || !current.visited) {
+                current.visited = true;
+                let next = checkNeighbors(current);
+
+                if (next) {
+                    next.visited = true;
+                    stack.push(current);
+                    removeWall(current, next);
+                    current = next;
+                } else if (stack.length > 0) {
+                    current = stack.pop();
+                }
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                grid.forEach(cell => cell.drawWalls());
+                await new Promise(r => setTimeout(r, 30)); // Delay for effect
+            }
+
+            drawMaze();
+        }
+
+        function drawMaze() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            grid.forEach(cell => cell.drawWalls());
+
+            ctx.fillStyle = "pink";
+            ctx.fillRect(finish.x * cellSize + 5, finish.y * cellSize + 5, cellSize - 10, cellSize - 10);
+
+            ctx.fillStyle = "lightblue";
+            ctx.beginPath();
+            ctx.arc(player.x * cellSize + cellSize / 2, player.y * cellSize + cellSize / 2, cellSize / 4, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function movePlayer(dx, dy) {
+            let newX = player.x + dx, newY = player.y + dy;
+            let currentCell = grid[getIndex(player.x, player.y)];
+            let nextCell = grid[getIndex(newX, newY)];
+
+            if (!nextCell) return;
+            if (dx === 1 && !currentCell.walls.right) player.x = newX;
+            if (dx === -1 && !currentCell.walls.left) player.x = newX;
+            if (dy === 1 && !currentCell.walls.bottom) player.y = newY;
+            if (dy === -1 && !currentCell.walls.top) player.y = newY;
+
+            drawMaze();
+            if (player.x === finish.x && player.y === finish.y) {
+                document.getElementById("message").style.opacity = "1";
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "ArrowUp") movePlayer(0, -1);
+            if (event.key === "ArrowDown") movePlayer(0, 1);
+            if (event.key === "ArrowLeft") movePlayer(-1, 0);
+            if (event.key === "ArrowRight") movePlayer(1, 0);
+        }
+
+        function generateNewMaze() {
+            document.getElementById("message").style.opacity = "0";
+            createGrid();
+            player = { x: 0, y: 0 };
+            stack = [];
+            generateMaze();
+        }
+
+        document.addEventListener("keydown", handleKeyPress);
+        generateNewMaze();
+    </script>
+</body>
+</html>

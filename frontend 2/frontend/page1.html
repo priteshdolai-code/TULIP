@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word by Word Display</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000000;
+            font-family: 'Roboto';
+            overflow: hidden;
+            
+            /* Add the GIF as background */
+            background-image: url(https://giffiles.alphacoders.com/222/222700.gif); /* Replace with the actual GIF URL */
+            background-size: cover; /* Make the GIF cover the entire screen */
+            background-position: center; /* Center the GIF */
+            background-repeat: no-repeat; /* Ensure the GIF doesn't repeat */
+        }
+
+        #word-container {
+            font-size: 15rem;
+            font-weight: 1200;
+            color: white;
+            text-align: center;
+            opacity: 0;
+            animation: fadeIn 2s ease-out forwards;
+            position: fixed; /* Fix the position to ensure it stays centered */
+        }
+
+        /* Fade-in effect */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="word-container"></div>
+
+    <script>
+        const word = "TULIP";
+        const container = document.getElementById("word-container");
+
+        let i = 0;
+        const interval = setInterval(() => {
+            container.textContent += word[i];
+            i++;
+            if (i === word.length) {
+                clearInterval(interval);
+                setTimeout(() => {
+                    // After 2 seconds, transition to the next page
+                    window.location.href = "2.html";  // Replace with your next page URL
+                }, 3000);
+            }
+        }, 500);  // Adjust the speed by changing the interval (in milliseconds)
+    </script>
+
+</body>
+</html>

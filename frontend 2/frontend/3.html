@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Subtitle Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            margin: 0;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            width: 100%;
+            background: #1e1e1e;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 15px 0;
+            display: flex;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            margin: 0 20px;
+            padding: 10px 15px;
+            transition: 0.3s;
+            border-radius: 5px;
+        }
+
+        .navbar a:hover {
+            background: #16a085;
+        }
+
+        /* Page Sections */
+        .section {
+            width: 90%;
+            max-width: 800px;
+            background: #1e1e1e;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        h2 {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        /* Video Upload & Player */
+        input[type="file"] {
+            padding: 12px;
+            background: #4f5151;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        input[type="file"]:hover {
+            background: #202121;
+        }
+
+        #video-container {
+            margin-top: 20px;
+            background: #000;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        #subtitle-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #222;
+            font-size: 18px;
+            font-weight: 400;
+            min-height: 60px;
+            color: #ffffff;
+        }
+
+        /* Button Styling */
+        .btn {
+            margin-top: 20px;
+            display: inline-block;
+            padding: 12px 20px;
+            background: #16a085;
+            color: white;
+            font-size: 18px;
+            font-weight: 500;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: #1abc9c;
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <a href="#home">Home</a>
+        <a href="#maze">Maze Game</a>
+        <a href="#instructions">Instructions</a>
+    </div>
+
+    <!-- Home Section -->
+    <div class="section" id="home">
+        <h2>UPLOAD VIDEO</h2>
+        <input type="file" id="videoInput" accept="video/*">
+        <div id="video-container">
+            <video id="videoPlayer" controls></video>
+        </div>
+        <div id="subtitle-box">Subtitles will appear here...</div>
+    </div>
+
+    <!-- Maze Game Section -->
+    <div class="section" id="maze">
+        <h2>Maze Game</h2>
+        <p>The maze game page allows you to navigate through a dynamically generated maze using voice or keyboard commands.</p>
+        <a href="maze.html" class="btn">Play Maze Game →</a>
+    </div>
+
+    <!-- Instructions Section -->
+    <div class="section" id="instructions">
+        <h2>How It Works</h2>
+        <ul style="text-align: left;">
+            <li>The system detects lip movements in real time.</li>
+            <li>Then it executes the commands.</li>
+        </ul>
+        <a href="" class="btn">Understand the system →</a>
+
+    </div>
+
+    <script>
+        const videoInput = document.getElementById('videoInput');
+        const videoPlayer = document.getElementById('videoPlayer');
+        
+        videoInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                videoPlayer.src = url;
+            }
+        });
+    </script>
+
+</body>
+</html>
