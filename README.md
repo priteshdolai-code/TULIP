@@ -91,6 +91,12 @@ frontend/          demo interface
 data/              data loading helpers
 ```
 
+> **Note on this implementation.** The notebook published here implements the
+> **3DCNN + ReLU + BiLSTM baseline** (3.26% WER in the table above) — the
+> comparison point the proposed model was measured against. The proposed
+> **3DCNN + Swish + BiGRU + BiLSTM** architecture and its 2.24% WER result are
+> described in the paper.
+
 ## Running It
 
 ```bash
